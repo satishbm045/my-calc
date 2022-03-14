@@ -1,0 +1,15 @@
+.App {
+  text-align: center;
+}
+.Heading{
+  font-size: 24px;
+  margin: 10px 0px;
+}
+.CalcContainer {
+  width: 50%;
+  margin: 0 auto;
+}
+.buttonContainer{
+  width: 50%;
+  margin: 0 auto;
+}
