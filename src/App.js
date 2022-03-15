@@ -12,61 +12,73 @@ function App() {
     {"opr":"divide","symbol":"/"}
   ])
   const [enteredValueData, setEnteredValueData] = useState('');
-  const [inputValue1, setInputValue1] = useState('');
-  const [inputValue2, setInputValue2] = useState('');
-  const [selectedOpr, setSelectedOpr] = useState('');
-  const [answer, setAnswer] = useState('');
+  const [answer, setAnswer] = useState([]);
+  const [isAnswerDisplay, setIsAnswerDisplay] = useState(false);
+
   const resetClick = () => {
     setEnteredValueData('');
-    setInputValue1('');
-    setSelectedOpr('');
     setAnswer('');
+    setIsAnswerDisplay(false);
   }
-  const callCalculation = (inputValue) => {
-    switch(selectedOpr){
-      case 'addition':
-        setAnswer(inputValue1+inputValue);
-        setEnteredValueData(inputValue1+inputValue);
-        break;
-      case 'substraction':
-        setAnswer(inputValue1-inputValue);
-        setEnteredValueData(inputValue1-inputValue);
-        break;
-      case 'multiply':
-        setAnswer(inputValue1*inputValue);
-        setEnteredValueData(inputValue1*inputValue);
-        break;
-      case 'divide':
-        setAnswer(inputValue1/inputValue);
-        setEnteredValueData(inputValue1/inputValue);
-        break;
+
+  const callSwitch = (value1,value2,oprValue) => {
+    switch(oprValue){
+      case '+':
+        return value1+value2;
+      case '-':
+        return value1-value2;
+      case 'x':
+        return value1*value2;
+      case '/':
+        return value1/value2;
       default: 
         return '';
     }
   }
+
+  const callCalculationWhole = (data) => {
+    let splitStr = data.split(" ");
+    var ansValue = 0;
+    splitStr.map((value,index)=>{
+      if(index == 0) {
+        ansValue = value;
+      }
+      if(index % 2 != 0){
+        let calcAns = callSwitch(parseInt(ansValue),parseInt(splitStr[index+1] || 0),value)
+        ansValue = parseInt(calcAns);
+      }
+      setAnswer(ansValue);
+      setEnteredValueData(ansValue);
+    })
+      let ansData = answer;
+      if(answer.length > 4){
+        ansData.shift()
+        ansData.push(ansValue);
+        setAnswer(ansData);
+      }else{
+        ansData.push(ansValue);
+        setAnswer(ansData);
+      }
+  }
+
   const numberClick = (value) => {
-    let inputValue = `${enteredValueData}${value}`
-    console.log(value);
+    var inputValue = `${enteredValueData}${value}`
     setEnteredValueData(inputValue);
   }
+
   const operationClick = (value) => {
-    if(selectedOpr){
-      // setAnswer(inputValue1)
-      if(answer || answer != ''){
-        setInputValue1(answer)
-      }
-      callCalculation(parseInt(enteredValueData))
-    }
-    console.log(value.opr);
-    setSelectedOpr(value.opr);
-    setInputValue1(parseInt(enteredValueData))
-    setEnteredValueData('');
+    var inputValue = `${enteredValueData} ${value.symbol} `;
+    setEnteredValueData(inputValue);
   }
+
   const submitClick = () => {
-    callCalculation(parseInt(enteredValueData))
-    setInputValue1('');
-    setSelectedOpr('');
+    callCalculationWhole(enteredValueData);
   }
+
+  const answerDisplay = (props) => {
+    setIsAnswerDisplay(!isAnswerDisplay);
+  }
+
   return (
     <div className="App">
       <div className='CalcContainer'>
@@ -74,6 +86,13 @@ function App() {
           My Calculator
         </div>
         <DisplayBox enteredValue={enteredValueData}/>
+        {
+          isAnswerDisplay && answer.map((value)=>{
+          return(
+            <DisplayBox enteredValue={value}/>
+            )
+          })
+        }
         <div className='buttonContainer'>
           {
             buttonData.map((value,index)=>{
@@ -92,7 +111,7 @@ function App() {
           }
           <ButtonBox buttonValue={"="} type={"number"} numberClick={submitClick}/>
           <ButtonBox buttonValue={"RESET"} type={"number"} numberClick={resetClick}/>
-          <ButtonBox buttonValue={"ANS"} type={"number"}/>
+          <ButtonBox buttonValue={"ANS"} type={"number"} numberClick={answerDisplay}/>
         </div>
       </div>
     </div>
